@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cruise Club | 크루즈 라이프 허브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --deep-blue: #0d2045;
+    --mid-blue: #1a3a6b;
+    --ocean: #1e5799;
+    --teal: #2a9d8f;
+    --aqua: #48cae4;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5f0e8;
+    --white: #ffffff;
+    --text-muted: rgba(255,255,255,0.55);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: pointer;
+    touch-action: manipulation; /* iOS 300ms 탭 딜레이 제거 */
+  }
+
+  /* ── 배경 바다 ── */
+  .ocean-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ocean-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(26,58,107,0.7) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 80% 80%, rgba(42,157,143,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(30,87,153,0.5) 0%, transparent 70%),
+      linear-gradient(180deg, #060e1c 0%, #0a1628 30%, #0d2045 70%, #0a2a3a 100%);
+  }
+  /* 별빛 */
+  .stars {
+    position: absolute;
+    inset: 0;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op, 0.2); transform: scale(1); }
+    50% { opacity: var(--max-op, 0.8); transform: scale(1.3); }
+  }
+
+  /* 물결 */
+  .waves-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 220px;
+  }
+  .wave {
+    position: absolute;
+    bottom: 0;
+    left: -50%;
+    width: 200%;
+    height: 100%;
+  }
+  .wave svg { width: 100%; height: 100%; }
+  .wave-1 { animation: waveMove 8s ease-in-out infinite; opacity: 0.3; }
+  .wave-2 { animation: waveMove 10s ease-in-out infinite reverse; opacity: 0.2; }
+  .wave-3 { animation: waveMove 12s ease-in-out infinite; opacity: 0.15; }
+  @keyframes waveMove {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5%); }
+  }
+
+  /* ── 메인 컨테이너 ── */
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    text-align: center;
+    margin-bottom: 52px;
+    animation: fadeUp 0.9s ease both;
+  }
+  .profile-ring {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--teal), var(--aqua));
+    padding: 2.5px;
+    margin-bottom: 20px;
+  }
+  .profile-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-style: italic;
+    color: var(--gold-light);
+    letter-spacing: 1px;
+  }
+  .header-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .header-name em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .header-tagline {
+    font-size: 12.5px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .header-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 0;
+  }
+  .divider-line {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .divider-icon { color: var(--gold); font-size: 14px; }
+
+  /* ── SNS 바 ── */
+  .sns-bar {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 44px;
+    animation: fadeUp 0.9s 0.15s ease both;
+  }
+  .sns-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(6px);
+  }
+  .sns-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+    background: rgba(201,168,76,0.1);
+    transform: translateY(-2px);
+  }
+  .sns-btn svg { width: 15px; height: 15px; }
+
+  /* ── 섹션 제목 ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.9s ease both;
+  }
+  .section-label-text {
+    font-size: 10.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .section-label-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,168,76,0.4), transparent);
+  }
+
+  /* ── 카드 ── */
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: fadeUp 0.9s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover {
+    border-color: rgba(201,168,76,0.35);
+    background: rgba(255,255,255,0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,168,76,0.15);
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .card-icon.blue   { background: linear-gradient(135deg, #1a3a6b, #1e5799); box-shadow: 0 4px 15px rgba(30,87,153,0.4); }
+  .card-icon.teal   { background: linear-gradient(135deg, #1a5f6e, #2a9d8f); box-shadow: 0 4px 15px rgba(42,157,143,0.4); }
+  .card-icon.gold   { background: linear-gradient(135deg, #7a5c1e, #c9a84c); box-shadow: 0 4px 15px rgba(201,168,76,0.4); }
+  .card-icon.aqua   { background: linear-gradient(135deg, #1a5c7a, #48cae4); box-shadow: 0 4px 15px rgba(72,202,228,0.4); }
+  .card-icon.purple { background: linear-gradient(135deg, #3a1a6b, #7c4dff); box-shadow: 0 4px 15px rgba(124,77,255,0.4); }
+  .card-icon.rose   { background: linear-gradient(135deg, #6b1a3a, #e91e8c); box-shadow: 0 4px 15px rgba(233,30,140,0.35); }
+
+  .card-body { flex: 1; min-width: 0; }
+  .card-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+  .card-badge {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .badge-new { background: rgba(42,157,143,0.25); color: var(--teal); border: 1px solid rgba(42,157,143,0.3); }
+  .badge-hot { background: rgba(201,168,76,0.2); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.25); }
+  .badge-open { background: rgba(72,202,228,0.15); color: var(--aqua); border: 1px solid rgba(72,202,228,0.2); }
+
+  .card-arrow {
+    color: rgba(255,255,255,0.3);
+    font-size: 18px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .card:hover .card-arrow { color: var(--gold); transform: translateX(4px); }
+
+  /* ── 신규 멤버 버튼 ── */
+  .newbie-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(42,200,100,0.45);
+    background: linear-gradient(135deg, rgba(42,200,100,0.12), rgba(30,87,153,0.12));
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.9s 0.35s ease both;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .newbie-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(42,200,100,0.05), transparent);
+    pointer-events: none;
+  }
+  .newbie-btn:hover {
+    border-color: rgba(42,200,100,0.7);
+    background: linear-gradient(135deg, rgba(42,200,100,0.2), rgba(30,87,153,0.15));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(42,200,100,0.2);
+  }
+  .newbie-btn-icon { font-size: 28px; flex-shrink: 0; }
+  .newbie-btn-body { flex: 1; }
+  .newbie-btn-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #6ddb8a;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+  }
+  .newbie-btn-desc {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+  .newbie-btn-arrow {
+    font-size: 24px;
+    color: #6ddb8a;
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .newbie-btn:hover .newbie-btn-arrow { transform: translateX(4px); }
+
+  /* ── 여행 모집 카드 ── */
+  .trip-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .trip-card {
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    animation: fadeUp 0.9s ease both;
+    transition: all 0.3s ease;
+  }
+  .trip-card:hover {
+    border-color: rgba(201,168,76,0.3);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+    transform: translateY(-2px);
+  }
+  .trip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 0;
+  }
+  .trip-date-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, var(--mid-blue), var(--ocean));
+    border-radius: 10px;
+    padding: 8px 14px;
+    min-width: 58px;
+  }
+  .trip-month {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  .trip-year {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+  .trip-status {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+  .trip-status.recruiting  { background: rgba(42,157,143,0.2); color: #4ecdc4; border: 1px solid rgba(42,157,143,0.35); }
+  .trip-status.upcoming    { background: rgba(201,168,76,0.15); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.3); }
+  .trip-status.coming-soon { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.12); }
+
+  .trip-body {
+    padding: 14px 20px 16px;
+  }
+  .trip-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .trip-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .trip-route {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+  }
+  .trip-detail-btn, .trip-apply-btn {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s;
+    letter-spacing: 0.3px;
+  }
+  .trip-detail-btn {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .trip-detail-btn:hover { background: rgba(255,255,255,0.09); color: var(--white); }
+  .trip-apply-btn {
+    background: linear-gradient(135deg, rgba(42,157,143,0.3), rgba(30,87,153,0.3));
+    color: #7ee8df;
+    border-top: 1px solid rgba(42,157,143,0.2);
+  }
+  .trip-apply-btn:hover {
+    background: linear-gradient(135deg, rgba(42,157,143,0.5), rgba(30,87,153,0.5));
+    color: #fff;
+  }
+
+  /* ── 잠금 게이트 ── */
+  .lock-gate {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 36px;
+    animation: fadeUp 0.9s ease both;
+  }
+  .lock-box {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 20px;
+    padding: 32px 28px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .step-gate .lock-box {
+    border-color: rgba(201,168,76,0.4);
+    background: rgba(201,168,76,0.05);
+  }
+  .lock-icon { font-size: 36px; margin-bottom: 14px; }
+  .lock-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .lock-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .lock-input-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .lock-input {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 11px 16px;
+    color: var(--white);
+    font-size: 18px;
+    letter-spacing: 6px;
+    width: 160px;
+    text-align: center;
+    outline: none;
+    font-family: monospace;
+    transition: border-color 0.2s;
+  }
+  .lock-input:focus { border-color: var(--gold); }
+  .lock-btn {
+    background: linear-gradient(135deg, var(--mid-blue), var(--teal));
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .lock-btn:hover { opacity: 0.85; }
+  .step-btn { background: linear-gradient(135deg, #7a5c1e, var(--gold)); }
+  .lock-error {
+    color: #ff6b6b;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60%  { transform: translateX(-6px); }
+    40%,80%  { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  .step-card { border-color: rgba(201,168,76,0.15) !important; }
+  .step-card:hover { border-color: rgba(201,168,76,0.4) !important; }
+
+  .logout-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 30px;
+    padding: 9px 22px;
+    color: rgba(255,255,255,0.4);
+    font-size: 12.5px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    margin-bottom: 36px;
+  }
+  .logout-btn:hover { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.25); }
+
+  /* ── 파트너 섹션 미니 그리드 ── */
+  .partner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .partner-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 18px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: fadeUp 0.9s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .partner-card::after {
+    content: '›';
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    font-size: 18px;
+    color: rgba(255,255,255,0.25);
+    transition: all 0.3s;
+  }
+  .partner-card:hover {
+    border-color: rgba(201,168,76,0.35);
+    background: rgba(255,255,255,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  }
+  .partner-card:hover::after { color: var(--gold); transform: translateX(3px); }
+  .partner-card-icon { font-size: 22px; }
+  .partner-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white);
+    line-height: 1.3;
+    padding-right: 16px;
+  }
+  .partner-card-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+  @media (max-width: 400px) {
+    .partner-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── FAQ 아코디언 ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .faq-item {
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    animation: fadeUp 0.9s ease both;
+  }
+  button, a, .faq-q, .lock-btn, .card, .trip-card, .partner-card, .newbie-btn {
+    touch-action: manipulation;
+  }
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+    background: none;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+  }
+  .faq-q:hover { background: rgba(255,255,255,0.04); }
+  .faq-q-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    line-height: 1.4;
+  }
+  .faq-q-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+    line-height: 1;
+  }
+  .faq-item.open .faq-q-icon { transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.22s ease-out, padding 0.2s;
+    padding: 0 20px;
+  }
+  .faq-item.open .faq-a { max-height: 1200px; padding: 0 20px 18px; }
+  .faq-a-inner {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding-top: 14px;
+  }
+  .faq-a-inner a {
+    color: var(--aqua);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .faq-a-inner strong { color: var(--gold-light); font-weight: 500; }
+
+  /* ── 푸터 ── */
+  .footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    animation: fadeUp 0.9s 0.5s ease both;
+  }
+  .footer-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+  }
+  .footer-anchor {
+    color: var(--gold);
+    opacity: 0.6;
+    font-size: 18px;
+    display: block;
+    margin: 10px auto 0;
+  }
+
+  /* ── 애니메이션 딜레이 ── */
+  .card:nth-child(1) { animation-delay: 0.1s; }
+  .card:nth-child(2) { animation-delay: 0.18s; }
+  .card:nth-child(3) { animation-delay: 0.26s; }
+  .card:nth-child(4) { animation-delay: 0.34s; }
+  .card:nth-child(5) { animation-delay: 0.42s; }
+  .card:nth-child(6) { animation-delay: 0.50s; }
+  .card:nth-child(7) { animation-delay: 0.58s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── 모바일 ── */
+  @media (max-width: 480px) {
+    .container { padding: 44px 16px 60px; }
+    .header-name { font-size: 30px; }
+    .card { padding: 16px 16px; gap: 14px; }
+    .card-icon { width: 42px; height: 42px; font-size: 19px; }
+    .sns-bar { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 배경 -->
+<div class="ocean-bg">
+  <div class="stars" id="stars"></div>
+  <div class="waves-container">
+    <div class="wave wave-1">
+      <svg viewBox="0 0 1440 150" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,80 C240,130 480,30 720,80 C960,130 1200,30 1440,80 L1440,150 L0,150 Z" fill="rgba(26,87,153,0.4)"/>
+      </svg>
+    </div>
+    <div class="wave wave-2">
+      <svg viewBox="0 0 1440 150" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,100 C240,50 480,130 720,90 C960,50 1200,120 1440,90 L1440,150 L0,150 Z" fill="rgba(42,157,143,0.3)"/>
+      </svg>
+    </div>
+    <div class="wave wave-3">
+      <svg viewBox="0 0 1440 150" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,60 C360,110 720,20 1080,70 C1260,95 1380,55 1440,60 L1440,150 L0,150 Z" fill="rgba(10,38,90,0.5)"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div class="container">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="profile-ring">
+      <div class="profile-inner">CC</div>
+    </div>
+    <h1 class="header-name"><em>Cruise</em> Club</h1>
+    <div class="header-divider">
+      <div class="divider-line"></div>
+      <span class="divider-icon">⚓</span>
+      <div class="divider-line"></div>
+    </div>
+  </div>
+
+  <!-- SNS -->
+  <div class="sns-bar">
+    <a href="https://www.incruises.com" target="_blank" class="sns-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+      inCruises 공식 웹사이트
+    </a>
+    <a href="https://band.us/n/a5acA8m6v7jc5" target="_blank" class="sns-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      크루즈클럽 밴드
+    </a>
+  </div>
+
+  <!-- 섹션: 비즈니스 -->
+  <div class="section-label" style="animation-delay:0.05s">
+    <span class="section-label-text">🚢 크루즈 멤버십 안내</span>
+    <div class="section-label-line"></div>
+  </div>
+  <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;letter-spacing:0.3px;">똑똑하게 크루즈 할인받아 가기</p>
+
+  <div class="cards">
+    <a href="https://kbellalee4808-star.github.io/-3.X/" target="_blank" class="card">
+      <div class="card-icon blue">🚢</div>
+      <div class="card-body">
+        <div class="card-title">크루즈 멤버십 구독 플랫폼</div>
+        <div class="card-desc">크루즈 라이프를 구독처럼 — 멤버십 소개 & 신청</div>
+      </div>
+      <span class="card-badge badge-hot">인기</span>
+      <span class="card-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- 섹션: 함께 떠나요 -->
+  <div class="section-label" style="animation-delay:0.32s">
+    <span class="section-label-text">✈️ 함께 떠나요</span>
+    <div class="section-label-line"></div>
+  </div>
+  <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;letter-spacing:0.3px;">자유여행이 무섭다면 크루즈클럽 멤버들과 함께 떠나요</p>
+
+  <div class="trip-cards">
+
+    <div class="trip-card">
+      <div class="trip-header">
+        <div class="trip-date-badge" style="background:linear-gradient(135deg,#3a1a1a,#6b2020);">
+          <span class="trip-month" style="color:#ff9090;">SOLD</span>
+          <span class="trip-year">OUT</span>
+        </div>
+        <div class="trip-status" style="background:rgba(255,80,80,0.15);color:#ff8080;border:1px solid rgba(255,80,80,0.3);">🔴 마감</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-title">🌅 이비자 · 서부지중해 크루즈</div>
+        <div class="trip-meta">
+          <span>🚢 MSC Cruises</span>
+        </div>
+        <div class="trip-route">로마 · 아말피 · 칸 · 이비자(1박) · 바르셀로나</div>
+      </div>
+      <div style="display:block;text-align:center;padding:12px;font-size:13px;font-weight:600;color:#ff8080;background:rgba(255,80,80,0.1);border-top:1px solid rgba(255,80,80,0.2);">🔴 Sold Out — 마감되었습니다</div>
+      <a href="https://kbellalee4808-star.github.io/Ibiza/" target="_blank" class="trip-detail-btn">상세보기</a>
+    </div>
+
+    <div class="trip-card">
+      <div class="trip-header">
+        <div class="trip-date-badge">
+          <span class="trip-month">OCT</span>
+          <span class="trip-year">2026</span>
+        </div>
+        <div class="trip-status recruiting">모집중</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-title">🌊 MSC 지중해 크루즈</div>
+        <div class="trip-meta">
+          <span>🗓 2026년 10월</span>
+          <span>🚢 MSC Seaview</span>
+        </div>
+        <div class="trip-route">로마 → 팔레르모 → 이비자 → 마르세유 → 제노아</div>
+      </div>
+      <a href="https://kbellalee4808-star.github.io/rome261016/" target="_blank" class="trip-detail-btn">상세보기</a>
+      <a href="https://forms.gle/9k6kVWBpjQp5knB76" target="_blank" class="trip-apply-btn">✉️ 신청하기</a>
+    </div>
+
+    <div class="trip-card">
+      <div class="trip-header">
+        <div class="trip-date-badge">
+          <span class="trip-month">DEC</span>
+          <span class="trip-year">2026</span>
+        </div>
+        <div class="trip-status upcoming">모집예정</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-title">🌸 일본 오키나와 크루즈</div>
+        <div class="trip-meta">
+          <span>🗓 2026년 12월 · 2027년 1월</span>
+          <span>🚢 선사 미정</span>
+        </div>
+        <div class="trip-route">오키나와 · 나하 · 이시가키 · 미야코지마</div>
+      </div>
+      <a href="https://open.kakao.com/o/s7yA5zse" target="_blank" class="trip-apply-btn">💬 관심 등록</a>
+    </div>
+
+    <div class="trip-card">
+      <div class="trip-header">
+        <div class="trip-date-badge">
+          <span class="trip-month">MAY</span>
+          <span class="trip-year">2027</span>
+        </div>
+        <div class="trip-status upcoming">모집예정</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-title">🏛 그리스 크루즈</div>
+        <div class="trip-meta">
+          <span>🗓 2027년 5월</span>
+          <span>🚢 Virgin Voyages</span>
+        </div>
+        <div class="trip-route">아테네 · 산토리니 · 미코노스 · 크레타</div>
+      </div>
+      <a href="https://open.kakao.com/o/gZkbnMoi" target="_blank" class="trip-apply-btn">💬 관심 등록</a>
+    </div>
+
+    <div class="trip-card">
+      <div class="trip-header">
+        <div class="trip-date-badge">
+          <span class="trip-month">JUN</span>
+          <span class="trip-year">2027</span>
+        </div>
+        <div class="trip-status upcoming">모집예정</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-title">🧊 알래스카 크루즈</div>
+        <div class="trip-meta">
+          <span>🗓 2027년 6월</span>
+          <span>🚢 Princess Cruises</span>
+        </div>
+        <div class="trip-route">시애틀 · 주노 · 케치칸 · 빙하만</div>
+      </div>
+      <a href="https://forms.gle/9k6kVWBpjQp5knB76" target="_blank" class="trip-apply-btn">✉️ 관심 등록</a>
+    </div>
+
+  </div>
+
+  <!-- 섹션: 가이드 & 도구 -->
+  <div class="section-label" style="animation-delay:0.38s">
+    <span class="section-label-text">🗺️ 가이드 & 도구</span>
+    <div class="section-label-line"></div>
+  </div>
+
+  <!-- 신규 멤버 시작 버튼 -->
+  <button onclick="openNewbie()" class="newbie-btn" style="width:100%;border:none;cursor:pointer;">
+    <div class="newbie-btn-icon">🟢</div>
+    <div class="newbie-btn-body">
+      <div class="newbie-btn-title">신규 멤버 · 이것만 하기!</div>
+      <div class="newbie-btn-desc">커뮤니티 입장 → 멤버십 확인 → 자동결제 설정 · 3단계 완성</div>
+    </div>
+    <div class="newbie-btn-arrow">›</div>
+  </button>
+
+  <!-- 신규멤버 모달 -->
+  <div id="newbie-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(6,14,28,0.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto;padding:20px 16px 40px;">
+    <div style="max-width:560px;margin:0 auto;background:linear-gradient(160deg,#0d2045,#0a1628);border:1px solid rgba(201,168,76,0.25);border-radius:20px;overflow:hidden;">
+      <!-- 모달 헤더 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(42,157,143,0.15),rgba(30,87,153,0.1));">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#6ddb8a;">🟢 신규 멤버 · 이것만 하기!</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">3단계 · 10분이면 완료해요 🙌</div>
+        </div>
+        <button onclick="closeNewbie()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">✕</button>
+      </div>
+      <!-- 모달 내용 -->
+      <div style="padding:20px;">
+
+        <!-- 인트로 -->
+        <div style="background:rgba(42,157,143,0.1);border-left:3px solid #6ddb8a;border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.75);line-height:1.7;">
+          💡 환영합니다! 아래 3단계만 순서대로 완료해 주세요.
+        </div>
+
+        <!-- STEP 1 -->
+        <div style="margin-bottom:20px;">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1a5f8a,#2980b9);border-radius:20px;padding:5px 14px;margin-bottom:12px;">
+            <span style="font-size:12px;font-weight:800;color:#fff;letter-spacing:1px;">STEP 1</span>
+            <span style="font-size:12px;color:rgba(255,255,255,0.8);">커뮤니티 입장</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://band.us/n/a5acA8m6v7jc5" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;text-decoration:none;color:inherit;touch-action:manipulation;">
+              <span style="font-size:22px;">📣</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#fff;">크루즈클럽 밴드 입장</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">여행 공지 · 소식 확인</div>
+              </div>
+              <span style="margin-left:auto;color:rgba(255,255,255,0.3);font-size:18px;">›</span>
+            </a>
+            <a href="https://open.kakao.com/o/grjrD4Sh" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;text-decoration:none;color:inherit;touch-action:manipulation;">
+              <span style="font-size:22px;">🚢</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#fff;">여행 공지방 입장</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">여행 멤버십 가입자 대상</div>
+              </div>
+              <span style="margin-left:auto;color:rgba(255,255,255,0.3);font-size:18px;">›</span>
+            </a>
+            <a href="https://open.kakao.com/o/gfVzHdeh" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;text-decoration:none;color:inherit;touch-action:manipulation;">
+              <span style="font-size:22px;">🚀</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#fff;">파트너 공지방 입장</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">파트너 사업자 대상</div>
+              </div>
+              <span style="margin-left:auto;color:rgba(255,255,255,0.3);font-size:18px;">›</span>
+            </a>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);padding:0 4px;">⚠️ 실명(활동명)으로 입장 · 질문은 추천 리더에게 개별 카톡으로</div>
+          </div>
+        </div>
+
+        <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:20px;"></div>
+
+        <!-- STEP 2 -->
+        <div style="margin-bottom:20px;">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1a5f8a,#2980b9);border-radius:20px;padding:5px 14px;margin-bottom:12px;">
+            <span style="font-size:12px;font-weight:800;color:#fff;letter-spacing:1px;">STEP 2</span>
+            <span style="font-size:12px;color:rgba(255,255,255,0.8);">멤버십 안내 확인</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <a href="https://www.notion.so/0b958cb9707283738f0f017b43b54c06" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.75);font-size:12.5px;touch-action:manipulation;">📋 크루즈 멤버십이란?<span style="margin-left:auto;color:rgba(255,255,255,0.25);">›</span></a>
+            <a href="https://www.notion.so/08158cb9707282aa901781f828b365a5" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.75);font-size:12.5px;touch-action:manipulation;">📊 멤버십 구조<span style="margin-left:auto;color:rgba(255,255,255,0.25);">›</span></a>
+            <a href="https://www.notion.so/85958cb9707283fe8cc981018bbe8e83" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.75);font-size:12.5px;touch-action:manipulation;">💎 리워드 사용 방식<span style="margin-left:auto;color:rgba(255,255,255,0.25);">›</span></a>
+            <a href="https://www.notion.so/e1a58cb9707282bb986e813b89730deb" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.75);font-size:12.5px;touch-action:manipulation;">⭐️ 멤버십 유지 규칙<span style="margin-left:auto;color:rgba(255,255,255,0.25);">›</span></a>
+            <a href="https://www.notion.so/10358cb970728221a4b58150120a12ea" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.75);font-size:12.5px;touch-action:manipulation;">🚢 크루즈 예약 방법<span style="margin-left:auto;color:rgba(255,255,255,0.25);">›</span></a>
+          </div>
+        </div>
+
+        <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:20px;"></div>
+
+        <!-- STEP 3 -->
+        <div style="margin-bottom:20px;">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7a5c1e,#c9a84c);border-radius:20px;padding:5px 14px;margin-bottom:12px;">
+            <span style="font-size:12px;font-weight:800;color:#fff;letter-spacing:1px;">STEP 3</span>
+            <span style="font-size:12px;color:rgba(255,255,255,0.9);">자동결제 카드 등록</span>
+          </div>
+          <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:16px;">
+            <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:2;">
+              로그인 → 지불 → 청구서 → 자동카드 등록
+            </div>
+            <div style="margin-top:10px;background:rgba(201,168,76,0.1);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6;">
+              ⚠️ <strong style="color:var(--gold-light);">VISA 또는 MASTER 카드</strong>만 등록 가능합니다.<br>해외결제 가능한 카드인지 꼭 확인해 주세요!
+            </div>
+          </div>
+        </div>
+
+        <!-- 완료 메시지 -->
+        <div style="background:linear-gradient(135deg,rgba(42,157,143,0.15),rgba(30,87,153,0.15));border:1px solid rgba(42,157,143,0.3);border-radius:14px;padding:16px;text-align:center;">
+          <div style="font-size:20px;margin-bottom:6px;">🎉</div>
+          <div style="font-size:13px;font-weight:600;color:#6ddb8a;">3단계 완료! 크루즈클럽 멤버가 되셨어요!</div>
+          <div style="font-size:11.5px;color:rgba(255,255,255,0.5);margin-top:4px;">여행 공지를 기대해 주세요 🚢</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+    <div class="newbie-btn-icon">🟢</div>
+    <div class="newbie-btn-body">
+      <div class="newbie-btn-title">신규 멤버 · 이것만 하기!</div>
+      <div class="newbie-btn-desc">커뮤니티 입장 → 멤버십 확인 → 자동결제 설정 · 3단계 완성</div>
+    </div>
+  <div class="cards">
+    <a href="https://kbellalee4808-star.github.io/Leadership/" target="_blank" class="card">
+      <div class="card-icon purple">🎓</div>
+      <div class="card-body">
+        <div class="card-title">리더십 아카데미</div>
+        <div class="card-desc">팀 리더 성장을 위한 교육 & 훈련 과정</div>
+      </div>
+      <span class="card-arrow">›</span>
+    </a>
+
+    <a href="https://cute-gouda-039.notion.site/28458cb9707280cd804ce92ca7adc5c2" target="_blank" class="card">
+      <div class="card-icon" style="background:linear-gradient(135deg,#1a5f3a,#2a9d5f);box-shadow:0 4px 15px rgba(42,157,95,0.4)">🧳</div>
+      <div class="card-body">
+        <div class="card-title">크루즈 여행 준비물 가이드</div>
+        <div class="card-desc">서류 · 의류 · 전자기기 · 꿀팁 체크리스트</div>
+      </div>
+      <span class="card-badge badge-new">FREE</span>
+      <span class="card-arrow">›</span>
+    </a>
+
+    <a href="https://drive.google.com/file/d/1EWHZhPU68_r7EQMCrIgk072yUd59JjId/view?usp=sharing" target="_blank" class="card">
+      <div class="card-icon" style="background:linear-gradient(135deg,#2d4a7a,#4a7cc7);box-shadow:0 4px 15px rgba(74,124,199,0.4)">📖</div>
+      <div class="card-body">
+        <div class="card-title">크루즈 생활백서 — 전자책 다운로드</div>
+        <div class="card-desc">승선부터 절약팁까지 — 입문자 완벽 가이드 PDF</div>
+      </div>
+      <span class="card-badge badge-new">FREE</span>
+      <span class="card-arrow">›</span>
+    </a>
+
+    <a href="https://kbellalee4808-star.github.io/cruiseculb/" target="_blank" class="card">
+      <div class="card-icon rose">🔗</div>
+      <div class="card-body">
+        <div class="card-title">나만의 멤버십 홍보 페이지</div>
+        <div class="card-desc">내 추천링크가 포함된 전자명함을 만들고 싶다면 주문하기</div>
+      </div>
+      <span class="card-arrow">›</span>
+    </a>
+
+    <a href="https://linktr.ee/Choooiyuree_Cruises" target="_blank" class="card">
+      <div class="card-icon teal">🎁</div>
+      <div class="card-body">
+        <div class="card-title">굿즈 주문</div>
+        <div class="card-desc">크루즈클럽 굿즈 & 인쇄물 주문하기</div>
+      </div>
+      <span class="card-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- 섹션: 크루즈 비즈니스 수익 시뮬레이터 (별도 강조) -->
+  <div class="section-label">
+    <span class="section-label-text">💰 크루즈 비즈니스 수익 시뮬레이터</span>
+    <div class="section-label-line"></div>
+  </div>
+  <div class="cards">
+    <a href="https://kbellalee4808-star.github.io/Nomad-Blue-Map/" target="_blank" class="card" style="border-color:rgba(42,157,143,0.35);background:linear-gradient(135deg,rgba(42,157,143,0.08),rgba(30,87,153,0.08));">
+      <div class="card-icon teal">🗺️</div>
+      <div class="card-body">
+        <div class="card-title">노마드 로드맵 시뮬레이터</div>
+        <div class="card-desc">팀 구조에 따른 월 수입 예측 시뮬레이션</div>
+      </div>
+      <span class="card-badge badge-new">필수</span>
+      <span class="card-arrow">›</span>
+    </a>
+    <div style="background:rgba(42,157,143,0.07);border:1px solid rgba(42,157,143,0.2);border-radius:14px;padding:16px 18px;font-size:12.5px;color:rgba(255,255,255,0.6);line-height:1.8;">
+      <span style="background:rgba(42,157,143,0.3);color:#4ecdc4;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:1px;margin-bottom:10px;display:inline-block;">예시</span><br>
+      내 직추 팀이 한달 이내 <strong style="color:var(--gold-light);">프리미엄 10명</strong>의 직추로<br>
+      일일활성화 <strong style="color:var(--white);">$50 × 10명 = $500</strong> 수령 했고,<br>
+      주간매칭 조건 달성 시 <strong style="color:#4ecdc4;">나도 $500을 매칭 받을 수 있음</strong>
+    </div>
+    <a href="https://kbellalee4808-star.github.io/Join-Cal/" target="_blank" class="card" style="border-color:rgba(201,168,76,0.35);background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(30,87,153,0.08));">
+      <div class="card-icon gold">💰</div>
+      <div class="card-body">
+        <div class="card-title">크루즈 비즈니스 수익 시뮬레이터</div>
+        <div class="card-desc">내가 받을 수 있는 수익 & 보너스 직접 계산해보기</div>
+      </div>
+      <span class="card-badge badge-hot">필수</span>
+      <span class="card-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- 섹션: 자주 묻는 질문 (오픈) -->
+  <div class="section-label">
+    <span class="section-label-text">❓ 자주 묻는 질문</span>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">수익금은 어떻게 출금하나요?</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        출금 방법은 두 가지예요.<br><br>
+        <strong>① 페이퀴커</strong> — 해외 계좌로 직접 송금<br>
+        <strong>② 인페이</strong> — 플랫폼 로그인 → 이월렛 → 인페이 메뉴에서 신청.<br><br>
+        💡 인페이가 안 열릴 경우 <strong>본인인증</strong>을 먼저 완료해 주세요.<br><br>
+        <strong>📺 인페이 신청 영상 가이드</strong><br>
+        <a href="https://youtu.be/DH6hJlZq8ns?si=q2B9we-7BCi-JWab" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(255,0,0,0.15),rgba(180,0,0,0.2));border:1px solid rgba(255,80,80,0.3);border-radius:10px;padding:9px 16px;color:#ff8080;text-decoration:none;font-size:12.5px;font-weight:500;margin-top:6px;margin-bottom:14px;">
+          ▶ YouTube에서 보기
+        </a><br>
+        <strong>🏦 은행 본사 영문 주소 (인페이 등록 시 참고)</strong>
+        <div style="overflow-x:auto;margin-top:10px;">
+          <table style="width:100%;border-collapse:collapse;font-size:11.5px;color:rgba(255,255,255,0.65);">
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <td style="padding:7px 8px;color:var(--gold-light);font-weight:500;white-space:nowrap;">신한은행</td>
+              <td style="padding:7px 8px;">20, Sejong-daero 9-gil, Jung-gu, Seoul</td>
+              <td style="padding:7px 8px;white-space:nowrap;">04513</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <td style="padding:7px 8px;color:var(--gold-light);font-weight:500;white-space:nowrap;">국민은행</td>
+              <td style="padding:7px 8px;">26, Gukjegeumyung-ro 8-gil, Yeongdeungpo-gu, Seoul</td>
+              <td style="padding:7px 8px;white-space:nowrap;">07331</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <td style="padding:7px 8px;color:var(--gold-light);font-weight:500;white-space:nowrap;">기업은행</td>
+              <td style="padding:7px 8px;">79, Eulji-ro, Jung-gu, Seoul</td>
+              <td style="padding:7px 8px;white-space:nowrap;">04541</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <td style="padding:7px 8px;color:var(--gold-light);font-weight:500;white-space:nowrap;">농협은행</td>
+              <td style="padding:7px 8px;">120, Saemunan-ro, Jung-gu, Seoul</td>
+              <td style="padding:7px 8px;white-space:nowrap;">04516</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 8px;color:var(--gold-light);font-weight:500;white-space:nowrap;">한국은행</td>
+              <td style="padding:7px 8px;">67, Sejong-daero, Jung-gu, Seoul</td>
+              <td style="padding:7px 8px;white-space:nowrap;">04514</td>
+            </tr>
+          </table>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">페이퀴커(PayQuicker)는 어떻게 등록하나요?</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        <strong>📍 등록 순서</strong><br><br>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:linear-gradient(135deg,#1a3a6b,#1e5799);color:var(--gold-light);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;">STEP 1</span>
+            <span style="font-size:13px;">플랫폼 로그인</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:linear-gradient(135deg,#1a3a6b,#1e5799);color:var(--gold-light);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;">STEP 2</span>
+            <span style="font-size:13px;">이월렛 클릭</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:linear-gradient(135deg,#1a3a6b,#1e5799);color:var(--gold-light);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;">STEP 3</span>
+            <span style="font-size:13px;">본인인증 완료</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:linear-gradient(135deg,#7a5c1e,#c9a84c);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;">STEP 4</span>
+            <span style="font-size:13px;">페이퀴커 클릭 후 등록 <strong style="color:var(--gold-light);">(영문 주소 필요!)</strong></span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="https://search.naver.com/search.naver?query=%EC%98%81%EB%AC%B8+%EC%A3%BC%EC%86%8C+%EB%B3%80%ED%99%98" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(0,176,80,0.2),rgba(0,130,60,0.2));border:1px solid rgba(0,200,80,0.35);border-radius:10px;padding:11px 16px;color:#5de88a;text-decoration:none;font-size:13px;font-weight:500;">
+            🔍 네이버 영문주소 검색하기
+          </a>
+          <a href="https://blog.naver.com/dadabooboo/223670702473" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(42,200,80,0.15),rgba(20,150,60,0.2));border:1px solid rgba(42,200,80,0.3);border-radius:10px;padding:11px 16px;color:#6ddb8a;text-decoration:none;font-size:13px;font-weight:500;">
+            📝 페이퀴커 블로그 가이드 보러가기
+          </a>
+        </div>
+      </div></div>
+    </div>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        <strong>📍 등록 순서</strong><br>
+        로그인 → 지불 → 청구서 → 자동카드 등록<br><br>
+        <strong>⚠️ 주의사항</strong><br>
+        해외결제가 가능한 <strong>VISA 또는 MASTER 카드</strong>만 등록됩니다.<br>
+        국내 전용 카드는 등록이 되지 않으니 해외결제 가능 여부를 먼저 확인해 주세요.
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">자동결제 카드는 어떻게 등록하나요?</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        <strong>📍 등록 순서</strong><br>
+        로그인 → 지불 → 청구서 → 자동카드 등록<br><br>
+        <strong>⚠️ 주의사항</strong><br>
+        해외결제가 가능한 <strong>VISA 또는 MASTER 카드</strong>만 등록됩니다.<br>
+        국내 전용 카드는 등록이 되지 않으니 해외결제 가능 여부를 먼저 확인해 주세요.
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">로그인이 안 돼요 / 오류가 나요</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        아래 주소로 이메일을 보내주세요.<br><br>
+        <strong>📧 메일 보낼 주소</strong><br>
+        <span style="font-family:monospace;color:var(--aqua);font-size:14px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3d51525a5453104e484d4d524f497d5453135a4f52484d">[email&#160;protected]</a></span><br>
+        <button onclick="copyEmail()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(72,202,228,0.2),rgba(30,87,153,0.2));border:1px solid rgba(72,202,228,0.35);border-radius:10px;padding:9px 16px;color:var(--aqua);font-size:12.5px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;" id="copy-email-btn">
+          📋 이메일 주소 복사하기
+        </button><br><br>
+
+        <strong>📝 메일 제목</strong><br>
+        <span style="color:rgba(255,255,255,0.75);font-size:13px;">로그인 재설정 요청드립니다 (Login Reset Request)</span><br>
+        <button onclick="copySubject()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(72,202,228,0.2),rgba(30,87,153,0.2));border:1px solid rgba(72,202,228,0.35);border-radius:10px;padding:9px 16px;color:var(--aqua);font-size:12.5px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;" id="copy-subject-btn">
+          📋 제목 복사하기
+        </button><br><br>
+
+        <strong>📝 메일 내용</strong>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px;margin-top:8px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.8;">
+          안녕하세요, 인크루즈 가입 중 비밀번호를 잘못 입력한 것 같아서 로그인이 되지 않습니다.<br>
+          신분증 사본과 신분증 들고 찍은 셀카를 첨부하오니 계정 확인 후 로그인 재설정이 가능하도록 도와주시기 바랍니다.<br>
+          감사합니다.<br><br>
+          • 이름 :<br>
+          • 링크받을 메일주소 :<br>
+          • 신분증 사본 첨부<br>
+          • 신분증 들고 찍은 셀카 첨부
+        </div>
+        <button onclick="copyBody()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(72,202,228,0.2),rgba(30,87,153,0.2));border:1px solid rgba(72,202,228,0.35);border-radius:10px;padding:9px 16px;color:var(--aqua);font-size:12.5px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;" id="copy-body-btn">
+          📋 메일 내용 복사하기
+        </button>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">지원요청은 어떻게 보내나요?</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        플랫폼 내에서 직접 지원요청을 보낼 수 있어요.<br><br>
+        <strong>📍 순서</strong><br>
+        플랫폼 로그인 → 우측 상단 <strong>?(물음표)</strong> 누른 후 → 알맞은 부서 선택 → 제목과 내용 <strong>2줄 이상</strong> 작성 후 제출<br><br>
+        💡 첨부파일은 <strong>1번에 1장씩</strong> 업로드됩니다.
+        <a href="https://www.notion.so/30858cb97072804e8553e249d3f36d13" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(42,157,143,0.2),rgba(30,87,153,0.2));border:1px solid rgba(42,157,143,0.35);border-radius:10px;padding:9px 16px;color:#4ecdc4;text-decoration:none;font-size:12.5px;font-weight:500;">
+          📸 스크린샷 가이드 보기 (노션)
+        </a>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">리워드 보호(Re paid)란 무엇인가요?</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        미납 팀원이 발생했을 때 <strong>내 리워드를 보호해 주는 시스템</strong>입니다.<br><br>
+        또한 inCruises는 <strong>Trust My Travel</strong>을 통해 재정적 보호를 제공합니다.<br>
+        소비자는 Incruises Financial Protection Channel 1의 파산으로부터 보호받고 전액 환불을 받을 수 있어요.<br><br>
+        <a href="https://www.trustprotects.me" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(42,157,143,0.25),rgba(30,87,153,0.25));border:1px solid rgba(42,157,143,0.4);border-radius:10px;padding:10px 16px;color:#4ecdc4;text-decoration:none;font-size:13px;font-weight:500;margin-top:4px;">
+          🛡️ 재정 보호 확인하기 — trustprotects.me
+        </a>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">프로필 사진은 어떻게 변경하나요?</span>
+        <span class="faq-q-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">
+        플랫폼 로그인 → 마이페이지 → 프로필 사진 클릭 후 변경 가능해요.<br>
+        <strong>5MB 이하</strong>로 압축 후 시도해 보세요.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ===== 파트너 전용 잠금 게이트 ===== -->
+  <div class="lock-gate" id="lock-gate">
+    <div class="lock-box">
+      <div class="lock-icon">🔐</div>
+      <div class="lock-title">파트너 & 스텝 전용</div>
+      <div class="lock-desc">비밀번호를 입력해 주세요</div>
+      <div class="lock-input-row">
+        <input type="password" id="pw-input" class="lock-input" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="••••">
+        <button class="lock-btn" onclick="checkPassword()">확인</button>
+      </div>
+      <div class="lock-error" id="lock-error">비밀번호가 틀렸어요 🙅</div>
+    </div>
+  </div>
+
+  <!-- 파트너 콘텐츠 (잠금 해제 후 표시) -->
+  <div id="partner-content" style="display:none">
+
+    <div class="section-label">
+      <span class="section-label-text">💼 파트너 시스템</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="partner-grid">
+      <a href="https://www.notion.so/17358cb970728332900501fa97154a3c" target="_blank" class="partner-card">
+        <div class="partner-card-icon">🔗</div>
+        <div class="partner-card-title">추천링크 만드는법</div>
+        <div class="partner-card-desc">내 링크로 팀원 초대하기</div>
+      </a>
+      <a href="https://www.notion.so/5e258cb970728396b0e90196d9e47aba" target="_blank" class="partner-card">
+        <div class="partner-card-icon">💳</div>
+        <div class="partner-card-title">페이퀴커 신청방법</div>
+        <div class="partner-card-desc">수익금 출금 계좌 등록</div>
+      </a>
+      <a href="https://www.notion.so/2eb58cb970728040ae05ea0bc34da308" target="_blank" class="partner-card">
+        <div class="partner-card-icon">💸</div>
+        <div class="partner-card-title">인페이 신청방법</div>
+        <div class="partner-card-desc">이월렛 → 인페이 출금</div>
+      </a>
+      <a href="https://www.notion.so/30858cb97072804e8553e249d3f36d13" target="_blank" class="partner-card">
+        <div class="partner-card-icon">🆘</div>
+        <div class="partner-card-title">지원요청 보내는법</div>
+        <div class="partner-card-desc">플랫폼 고객지원 요청</div>
+      </a>
+      <a href="https://kbellalee4808-star.github.io/Nomad-Blue-Map/" target="_blank" class="partner-card">
+        <div class="partner-card-icon">🗺️</div>
+        <div class="partner-card-title">노마드 로드맵 시뮬레이터</div>
+        <div class="partner-card-desc">팀 구조별 월 수입 예측</div>
+      </a>
+      <a href="https://kbellalee4808-star.github.io/Join-Cal/" target="_blank" class="partner-card">
+        <div class="partner-card-icon">💰</div>
+        <div class="partner-card-title">크루즈 비즈니스 수익 시뮬레이터</div>
+        <div class="partner-card-desc">보너스 직접 계산해보기</div>
+      </a>
+      <a href="https://www.notion.so/19e58cb9707283c4be9101a79771536b" target="_blank" class="partner-card">
+        <div class="partner-card-icon">🏆</div>
+        <div class="partner-card-title">랭크 표</div>
+        <div class="partner-card-desc">등급별 혜택 한눈에 보기</div>
+      </a>
+      <a href="https://www.notion.so/75b58cb97072824290868136f1857e8b" target="_blank" class="partner-card">
+        <div class="partner-card-icon">📋</div>
+        <div class="partner-card-title">미팅 전 준비물</div>
+        <div class="partner-card-desc">파트너 미팅 체크리스트</div>
+      </a>
+      <a href="https://www.notion.so/31c58cb9707280b2a40dc2cbd4648f9b" target="_blank" class="partner-card">
+        <div class="partner-card-icon">🖨️</div>
+        <div class="partner-card-title">인쇄신청</div>
+        <div class="partner-card-desc">명함·홍보물 신청하기</div>
+      </a>
+      <a href="https://linktr.ee/Choooiyuree_Cruises" target="_blank" class="partner-card">
+        <div class="partner-card-icon">🎁</div>
+        <div class="partner-card-title">굿즈 주문</div>
+        <div class="partner-card-desc">크루즈클럽 굿즈 주문하기</div>
+      </a>
+    </div>
+
+    <!-- ===== 스텝 전용 잠금 게이트 ===== -->
+    <div class="lock-gate step-gate" id="step-lock-gate">
+      <div class="lock-box">
+        <div class="lock-icon">👑</div>
+        <div class="lock-title">스텝 전용 구역</div>
+        <div class="lock-desc">스텝 비밀번호를 입력해 주세요</div>
+        <div class="lock-input-row">
+          <input type="password" id="step-pw-input" class="lock-input" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="••••">
+          <button class="lock-btn step-btn" onclick="checkStepPassword()">확인</button>
+        </div>
+        <div class="lock-error" id="step-lock-error">비밀번호가 틀렸어요 🙅</div>
+      </div>
+    </div>
+
+    <!-- 스텝 콘텐츠 -->
+    <div id="step-content" style="display:none">
+      <div class="section-label">
+        <span class="section-label-text">👑 스텝 전용</span>
+        <div class="section-label-line"></div>
+      </div>
+      <div class="partner-grid">
+        <a href="https://www.notion.so/30958cb9707280f3803cd8a35f00520e" target="_blank" class="partner-card step-card">
+          <div class="partner-card-icon">📩</div>
+          <div class="partner-card-title">미납자 문자 보내기</div>
+          <div class="partner-card-desc">미납 발생 시 대응 가이드</div>
+        </a>
+        <a href="https://www.notion.so/02b58cb97072828f856b811d98010651" target="_blank" class="partner-card step-card">
+          <div class="partner-card-icon">⚠️</div>
+          <div class="partner-card-title">미납일때 이렇게 하세요</div>
+          <div class="partner-card-desc">미납 처리 단계별 안내</div>
+        </a>
+        <a href="https://www.notion.so/53158cb9707283e091af012bef41b0f5" target="_blank" class="partner-card step-card">
+          <div class="partner-card-icon">🎬</div>
+          <div class="partner-card-title">파트너 관심자 필수영상</div>
+          <div class="partner-card-desc">개인톡 전달용 영상</div>
+        </a>
+        <a href="https://www.notion.so/30858cb9707280a3ad31f08dac021151" target="_blank" class="partner-card step-card">
+          <div class="partner-card-icon">📝</div>
+          <div class="partner-card-title">예약 전 동의사항</div>
+          <div class="partner-card-desc">구글폼 동의 링크</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 로그아웃 버튼 -->
+    <div style="text-align:center; margin-bottom: 20px;">
+      <button class="logout-btn" onclick="logout()">🔒 로그아웃</button>
+    </div>
+
+  </div><!-- /partner-content -->
+
+  <!-- 푸터 -->
+  <div class="footer">
+    <span class="footer-anchor">⚓</span>
+    <p class="footer-text">바다 위에서도, 꿈은 계속됩니다</p>
+  </div>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  /* 신규멤버 모달 */
+  function openNewbie() {
+    const modal = document.getElementById('newbie-modal');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeNewbie() {
+    const modal = document.getElementById('newbie-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  // 모달 바깥 클릭 시 닫기
+  document.getElementById('newbie-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeNewbie();
+  });
+
+  /* 별 생성 */
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 50; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      top:${Math.random()*65}%;
+      left:${Math.random()*100}%;
+      --dur:${2+Math.random()*4}s;
+      --delay:${Math.random()*4}s;
+      --min-op:${0.1+Math.random()*0.2};
+      --max-op:${0.5+Math.random()*0.5};
+    `;
+    starsEl.appendChild(s);
+  }
+
+  /* 이메일 복사 */
+  function copyEmail() {
+    navigator.clipboard.writeText('login-support@in.group').then(() => {
+      const btn = document.getElementById('copy-email-btn');
+      btn.textContent = '✅ 복사됐어요!';
+      btn.style.borderColor = 'rgba(42,157,143,0.5)';
+      btn.style.color = '#4ecdc4';
+      setTimeout(() => {
+        btn.innerHTML = '📋 이메일 주소 복사하기';
+        btn.style.borderColor = 'rgba(72,202,228,0.35)';
+        btn.style.color = 'var(--aqua)';
+      }, 2000);
+    });
+  }
+
+  /* FAQ 아코디언 - iOS 호환 */
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  /* 비밀번호 */
+  const PW_PARTNER = '0070';
+  const PW_STEP    = '1004';
+
+  /* 파트너 비번 확인 */
+  function checkPassword() {
+    const input = document.getElementById('pw-input');
+    const val = input ? input.value : '';
+    const err = document.getElementById('lock-error');
+    if (val === PW_PARTNER || val === PW_STEP) {
+      document.getElementById('lock-gate').style.display = 'none';
+      document.getElementById('partner-content').style.display = 'block';
+      if (val === PW_STEP) {
+        document.getElementById('step-lock-gate').style.display = 'none';
+        document.getElementById('step-content').style.display = 'block';
+      }
+      if (err) err.style.display = 'none';
+    } else {
+      if (err) err.style.display = 'block';
+      if (input) { input.value = ''; input.classList.add('shake'); setTimeout(() => input.classList.remove('shake'), 500); }
+    }
+  }
+
+  /* 스텝 비번 확인 */
+  function checkStepPassword() {
+    const input = document.getElementById('step-pw-input');
+    const val = input ? input.value : '';
+    const err = document.getElementById('step-lock-error');
+    if (val === PW_STEP) {
+      document.getElementById('step-lock-gate').style.display = 'none';
+      document.getElementById('step-content').style.display = 'block';
+      if (err) err.style.display = 'none';
+    } else {
+      if (err) err.style.display = 'block';
+      if (input) { input.value = ''; input.classList.add('shake'); setTimeout(() => input.classList.remove('shake'), 500); }
+    }
+  }
+
+  /* 엔터키 */
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    const gate = document.getElementById('lock-gate');
+    const stepGate = document.getElementById('step-lock-gate');
+    if (gate && gate.style.display !== 'none') checkPassword();
+    else if (stepGate && stepGate.style.display !== 'none') checkStepPassword();
+  });
+
+  /* 로그아웃 */
+  function logout() {
+    document.getElementById('partner-content').style.display = 'none';
+    document.getElementById('lock-gate').style.display = 'flex';
+    const p = document.getElementById('pw-input'); if (p) p.value = '';
+    document.getElementById('step-content').style.display = 'none';
+    document.getElementById('step-lock-gate').style.display = 'flex';
+    const s = document.getElementById('step-pw-input'); if (s) s.value = '';
+  }
+
+  /* 제목 복사 */
+  function copySubject() {
+    const text = '로그인 재설정 요청드립니다 (Login Reset Request)';
+    const btn = document.getElementById('copy-subject-btn');
+    function onSuccess() {
+      if (btn) { btn.textContent = '✅ 복사됐어요!'; setTimeout(() => { btn.textContent = '📋 제목 복사하기'; }, 2000); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, btn, '📋 제목 복사하기'));
+    } else { fallbackCopy(text, btn, '📋 제목 복사하기'); }
+  }
+
+  /* 메일 내용 복사 */
+  function copyBody() {
+    const text = `안녕하세요, 인크루즈 가입 중 비밀번호를 잘못 입력한 것 같아서 로그인이 되지 않습니다.\n신분증 사본과 신분증 들고 찍은 셀카를 첨부하오니 계정 확인 후 로그인 재설정이 가능하도록 도와주시기 바랍니다.\n감사합니다.\n\n• 이름 :\n• 링크받을 메일주소 :\n• 신분증 사본 첨부\n• 신분증 들고 찍은 셀카 첨부`;
+    const btn = document.getElementById('copy-body-btn');
+    function onSuccess() {
+      if (btn) { btn.textContent = '✅ 복사됐어요!'; setTimeout(() => { btn.textContent = '📋 메일 내용 복사하기'; }, 2000); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, btn, '📋 메일 내용 복사하기'));
+    } else { fallbackCopy(text, btn, '📋 메일 내용 복사하기'); }
+  }
+
+  /* 이메일 복사 - iOS 호환 */
+  function copyEmail() {
+    const email = 'login-support@in.group';
+    const btn = document.getElementById('copy-email-btn');
+    function onSuccess() {
+      if (btn) { btn.textContent = '✅ 복사됐어요!'; setTimeout(() => { btn.textContent = '📋 이메일 주소 복사하기'; }, 2000); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(onSuccess).catch(function() {
+        const ta = document.createElement('textarea');
+        ta.value = email; ta.style.cssText = 'position:fixed;opacity:0;';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try { document.execCommand('copy'); onSuccess(); } catch(e) {}
+        document.body.removeChild(ta);
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = email; ta.style.cssText = 'position:fixed;opacity:0;';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); onSuccess(); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  /* 모든 외부 링크 → 새 탭 강제 오픈 (뒤로가기 문제 방지) */
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('a[href]').forEach(function(link) {
+      var href = link.getAttribute('href');
+      if (href && href.startsWith('http') && !href.includes(location.hostname)) {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.open(href, '_blank', 'noopener,noreferrer');
+        });
+        link.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          window.open(href, '_blank', 'noopener,noreferrer');
+        });
+      }
+    });
+
+    /* FAQ 터치 */
+    document.querySelectorAll('.faq-q').forEach(function(el) {
+      el.addEventListener('touchend', function(e) { e.preventDefault(); toggleFaq(this); });
+    });
+    /* 잠금 버튼 터치 */
+    var lockBtn = document.querySelector('.lock-btn:not(.step-btn)');
+    var stepBtn = document.querySelector('.step-btn');
+    if (lockBtn) lockBtn.addEventListener('touchend', function(e) { e.preventDefault(); checkPassword(); });
+    if (stepBtn) stepBtn.addEventListener('touchend', function(e) { e.preventDefault(); checkStepPassword(); });
+ 
